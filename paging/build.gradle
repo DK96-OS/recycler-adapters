@@ -1,0 +1,64 @@
+plugins {
+    id "java-library"
+    id 'org.jetbrains.kotlin.jvm'
+    id "jacoco"
+    id "org.jetbrains.dokka" version "1.6.10"
+}
+apply from: "../dependencies.gradle"
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+	withJavadocJar()
+	withSourcesJar()
+}
+
+tasks.sourcesJar {
+	duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			groupId = "io.github.dk96-os.recycler-adapters"
+			artifactId = "paging"
+			version = "1.0.0"
+			from components.java
+		}
+	}
+}
+
+dependencies {
+    
+    testImplementation junit
+}
+
+sourceSets.main {
+	java.srcDirs("src/main/java")
+}
+
+tasks.jacocoTestReport {
+	dependsOn tasks.test
+	reports {
+		xml.required = false
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir("jacocoReport")
+	}
+}
+
+tasks.jacocoTestCoverageVerification {
+	dependsOn tasks.test
+	violationRules {
+		failOnViolation = true
+		rule {
+			limit {
+				counter = "INSTRUCTION"
+				minimum = 0.5
+			}
+			limit {
+				counter = "BRANCH"
+				minimum = 0.5
+			}
+		}
+	}
+}
